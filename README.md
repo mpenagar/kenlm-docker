@@ -3,7 +3,7 @@ kenlm Docker images
 
 Two images are available:
 
-Debian
+Alpine
 -------------------
 
 [![Docker Stars](https://img.shields.io/docker/stars/mpenagar/vanitygen-plus.svg?style=flat-square)](https://hub.docker.com/r/mpenagar/vanitygen-plus/)
