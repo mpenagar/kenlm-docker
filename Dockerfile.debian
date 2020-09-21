@@ -1,0 +1,30 @@
+  
+# Multistage docker build, requires docker 17.05
+
+# builder stage
+FROM debian:buster-slim as builder
+
+RUN apt-get update && \
+    apt-get -y install git build-essential cmake libboost-system-dev libboost-thread-dev libboost-program-options-dev libboost-test-dev libeigen3-dev zlib1g-dev libbz2-dev liblzma-dev
+
+RUN git clone https://github.com/kpu/kenlm
+
+RUN cd kenlm && \
+    mkdir -p build && \
+    cd build && \
+    cmake .. && \
+    make -j `nproc`
+
+
+# runtime stage
+FROM debian:buster-slim
+
+RUN apt-get update && \
+    apt-get --no-install-recommends --yes install \
+        libboost-system-dev libboost-thread-dev libboost-program-options-dev libboost-test-dev \
+        libeigen3-dev zlib1g-dev libbz2-dev liblzma-dev && \
+    rm -rf /var/lib/apt/lists/*
+    
+COPY --from=builder /kenlm/build/bin /kenlm/bin
+
+ENV PATH="/kenlm/bin:${PATH}"
