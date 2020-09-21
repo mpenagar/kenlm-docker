@@ -1,0 +1,29 @@
+# Multistage docker build, requires docker 17.05
+
+# builder stage
+FROM alpine as builder
+
+RUN apk --update add \
+    git gcc make g++ zlib-dev cmake \
+    boost-system boost-thread boost-program_options boost-dev \
+    eigen-dev zlib-dev bzip2-dev xz-libs
+
+RUN git clone https://github.com/kpu/kenlm
+
+RUN cd kenlm && \
+    mkdir -p build && \
+    cd build && \
+    cmake .. && \
+    make -j `nproc`
+
+
+# runtime stage
+FROM alpine
+
+RUN apk --update add \
+    zlib libbz2 libstdc++ libgcc musl \
+    boost-thread boost-program_options libgomp
+
+COPY --from=builder /kenlm/build/bin /kenlm/bin
+
+ENV PATH="/kenlm/bin:${PATH}"
