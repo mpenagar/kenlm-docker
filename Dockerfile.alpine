@@ -22,7 +22,8 @@ FROM alpine
 
 RUN apk --update add \
     zlib libbz2 libstdc++ libgcc musl \
-    boost-thread boost-program_options libgomp
+    boost-thread boost-program_options libgomp \
+    xz-dev
 
 COPY --from=builder /kenlm/build/bin /kenlm/bin
 
